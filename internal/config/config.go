@@ -240,8 +240,10 @@ type CharacterCfg struct {
 		CompanionGamePassword string `yaml:"companionGamePassword"`
 	} `yaml:"companion"`
 	Gambling struct {
-		Enabled bool        `yaml:"enabled"`
-		Items   []item.Name `yaml:"items"`
+		Enabled     bool        `yaml:"enabled"`
+		LessRefresh bool        `yaml:"lessrefresh"`
+		GambleMap   bool        `yaml:"gamblemap"`
+		Items       []item.Name `yaml:"items"`
 	} `yaml:"gambling"`
 	CubeRecipes struct {
 		Enabled              bool     `yaml:"enabled"`
