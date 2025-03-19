@@ -12,22 +12,9 @@ merge_pr () {
 }
 
 prs=(
-    683 # Fix issue with ping ponging between the two entrances to the same area
-    684 # Enable/Repair game.ShiftKey ( shift + left click )
-    713 # Walkable logic ( door handling and monsters) 
-    716 # Companion Mode + New Flow
-    736 # Frostnova orb sorceress
-    738 # Hydra/Ball Sorceress
-    733 # better gambling circlets/coronets
-    731 # potions to belt after death
-    703 # add configurable Kill Ghosts? to Countess run
-    690 # update Terror_Zone
-    685 # update to Sorceress_Leveling
-    674 # update to level_tools to improve allocation of stats/skills
-    646 # Supervisor names in Discord Integration
-    642 # Summoner red portal exit
-    742 # automatically changes runs based and gives warnings when Leveling class selected
-    
+    751 # support for blood ring + blood amulet crafting
+    748 # improves companion script, can follow manually played player as well
+    749 # generic character + other characters added to playable classes
     # 729 # Optimize attack.go and move.go  -- this one has conflicts, not sure about it yet
 )
 
