@@ -173,8 +173,143 @@ func (s *SinglePlayerSupervisor) HandleMenuFlow() error {
 
 	s.bot.ctx.RefreshGameData()
 
+<<<<<<< HEAD
 	if s.bot.ctx.Data.OpenMenus.LoadingScreen {
 		utils.Sleep(500)
+=======
+	// Catch-all
+	if s.bot.ctx.CharacterCfg.AuthMethod != "None" && s.bot.ctx.GameReader.IsInCharacterSelectionScreen() && !s.bot.ctx.GameReader.IsOnline() {
+
+		// Try and click the online tab to re-connect to bnet
+		s.bot.ctx.HID.Click(game.LeftButton, 1090, 32) // click the online button
+
+		// Wait a bit
+		utils.Sleep(4000)
+
+		// Check if we're online again, if not, kill the client
+		if !s.bot.ctx.GameReader.IsOnline() {
+
+			// Kill the client so the crash detector will restart it
+			if err := s.KillClient(); err != nil {
+				return err
+			}
+
+			return fmt.Errorf("we've lost connection to bnet or client glitched. The d2r process will be killed")
+		}
+	}
+
+	// We're either in the in the Lobby or Character selection screen. Let's check
+	if s.bot.ctx.GameReader.IsInCharacterSelectionScreen() {
+		// TODO: Add Joining Games
+
+		if s.bot.ctx.CharacterCfg.Game.CreateLobbyGames {
+			retryCount := 0
+			for !s.bot.ctx.GameReader.IsInLobby() {
+
+				// Prevent an infinite loop
+				if retryCount >= 5 && !s.bot.ctx.GameReader.IsInLobby() {
+					return fmt.Errorf("failed to enter bnet lobby after 5 retries")
+				}
+
+				// Try to enter bnet lobby
+				s.bot.ctx.HID.Click(game.LeftButton, 744, 650)
+				utils.Sleep(1000)
+			}
+
+			if _, err := s.bot.ctx.Manager.CreateOnlineGame(s.bot.ctx.CharacterCfg.Game.PublicGameCounter); err != nil {
+				s.bot.ctx.CharacterCfg.Game.PublicGameCounter++
+				return fmt.Errorf("failed to create an online game")
+
+			} else {
+				// We created the game successfully!
+				s.bot.ctx.CharacterCfg.Game.PublicGameCounter++
+				return nil
+			}
+		} else {
+			// TODO: Add logic to check if we're on the online or offline tab and handle it accordingly.
+			if !s.bot.ctx.GameReader.IsOnline() && s.bot.ctx.CharacterCfg.AuthMethod != "None" {
+
+				// Try and click the online tab to re-connect to bnet
+				s.bot.ctx.HID.Click(game.LeftButton, 1090, 32) // click the online button
+
+				// Wait a bit
+				utils.Sleep(4000)
+
+				// Check again
+				if !s.bot.ctx.GameReader.IsOnline() {
+					// We failed to re-connect. Kill the client so it will get re-started automatically.
+					if err := s.KillClient(); err != nil {
+						return err
+					}
+					return fmt.Errorf("lost connection to bnet, killing client")
+				}
+			}
+
+			// Create the game
+			if err := s.bot.ctx.Manager.NewGame(); err != nil {
+				return fmt.Errorf("failed to create game")
+			}
+
+			return nil
+		}
+	} else if s.bot.ctx.GameReader.IsInLobby() {
+		// TODO: Add Joining Games
+
+		// Check if we are suppose to create lobby games and enter lobby.
+		if s.bot.ctx.CharacterCfg.Game.CreateLobbyGames {
+
+			retryCount := 0
+			for !s.bot.ctx.GameReader.IsInLobby() {
+
+				// Prevent an infinite loop
+				if retryCount >= 5 && !s.bot.ctx.GameReader.IsInLobby() {
+					return fmt.Errorf("failed to enter bnet lobby after 5 retries")
+				}
+
+				// Try to enter bnet lobby
+				s.bot.ctx.HID.Click(game.LeftButton, 744, 650)
+				utils.Sleep(1000)
+			}
+
+			if _, err := s.bot.ctx.Manager.CreateOnlineGame(s.bot.ctx.CharacterCfg.Game.PublicGameCounter); err != nil {
+				s.bot.ctx.CharacterCfg.Game.PublicGameCounter++
+				return fmt.Errorf("failed to create an online game")
+
+			} else {
+				// We created the game successfully!
+				s.bot.ctx.CharacterCfg.Game.PublicGameCounter++
+				return nil
+			}
+		} else {
+			// Press escape to exit the lobby
+			s.bot.ctx.HID.PressKey(0x1B) // ESC - to avoid importing win here as well
+			utils.Sleep(1000)
+
+			for range 5 {
+				if s.bot.ctx.GameReader.IsInCharacterSelectionScreen() && s.bot.ctx.GameReader.IsOnline() {
+					break
+				}
+
+				if s.bot.ctx.GameReader.IsInLobby() {
+					// Mission failed
+					s.bot.ctx.HID.PressKey(0x1B) // ESC - to avoid importing win here as well
+					utils.Sleep(1000)
+				}
+			}
+
+			if !s.bot.ctx.GameReader.IsInCharacterSelectionScreen() {
+				return fmt.Errorf("failed to leave lobby or an unknown case occurred")
+			}
+
+			// Create the game
+			if err := s.bot.ctx.Manager.NewGame(); err != nil {
+				return fmt.Errorf("failed to create game")
+			}
+		}
+	} else if s.bot.ctx.Data.OpenMenus.LoadingScreen {
+		// We're in a loading screen, wait a bit
+		utils.Sleep(250)
+>>>>>>> pr-751
 		return fmt.Errorf("loading screen")
 	}
 
