@@ -42,6 +42,26 @@ func ClearCurrentLevel(openChests bool, filter data.MonsterFilter) error {
 				}
 				utils.Sleep(500) // Add small delay to allow the game to open the chest and drop the content
 			}
+			
+			//interact with xp shrine
+            if o.IsShrine() && o.Selectable && r.IsInside(o.Position) {
+                if o.Shrine.ShrineType == object.ExperienceShrine {
+                    ctx.Logger.Debug(fmt.Sprintf("Found experience shrine. attempting to interact. Name=%s. ID=%v UnitID=%v Pos=%v,%v Area='%s' InteractType=%v", o.Desc().Name, o.Name, o.ID, o.Position.X, o.Position.Y, ctx.Data.PlayerUnit.Area.Area().Name, o.InteractType))
+                    err = MoveToCoords(o.Position)
+                    if err != nil {
+                        ctx.Logger.Warn("Failed moving to shrine", slog.Any("error", err))
+                        continue
+                    }
+                    err = InteractObject(o, func() bool {
+                        shrine, _ := ctx.Data.Objects.FindByID(o.ID)
+                        return !shrine.Selectable
+                    })
+                    if err != nil {
+                        ctx.Logger.Warn("Failed interacting with shrine", slog.Any("error", err))
+                    }
+                    utils.Sleep(500) // Add small delay to allow the game to open the shrine
+                }
+            }
 		}
 	}
 
