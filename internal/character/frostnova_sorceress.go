@@ -15,10 +15,12 @@ import (
 )
 
 const (
-	FrostNovaMinDistance    = 6
-	FrostNovaMaxDistance    = 9
-	FNStaticMinDistance     = 13
-	FNStaticMaxDistance     = 22
+	FrostNovaMinDistance = 6
+	FrostNovaMaxDistance = 9
+	/*FNStaticMinDistance     = 13
+	FNStaticMaxDistance     = 22*/
+	FNStaticMinDistance     = 5
+	FNStaticMaxDistance     = 15
 	FrostNovaMaxAttacksLoop = 10
 	FNStaticFieldThreshold  = 67 // Cast Static Field if monster HP is above this percentage
 	FrostNovaOrbMinDistance = 6
