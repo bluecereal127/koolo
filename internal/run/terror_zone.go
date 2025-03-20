@@ -4,6 +4,8 @@ import (
 	"fmt"
 	"slices"
 
+	"github.com/hectorgimenez/koolo/internal/utils"
+
 	"github.com/hectorgimenez/d2go/pkg/data"
 	"github.com/hectorgimenez/d2go/pkg/data/area"
 	"github.com/hectorgimenez/koolo/internal/action"
@@ -85,13 +87,20 @@ func (tz TerrorZone) Run() error {
 				if err != nil {
 					return err
 				}
+				_ = action.OpenTPIfLeader()
 			} else {
 				err := action.MoveToArea(tzArea)
 				if err != nil {
 					return err
 				}
+				_ = action.OpenTPIfLeader()
 			}
 			if slices.Contains(availableTzs, tzArea) {
+				if tz.ctx.CharacterCfg.Companion.Leader {
+					action.OpenTPIfLeader()
+					utils.Sleep(5000)
+					action.Buff()
+				}
 				action.ClearCurrentLevel(tz.ctx.CharacterCfg.Game.TerrorZone.OpenChests, tz.customTZEnemyFilter())
 			} else {
 				tz.ctx.Logger.Debug("Skipping area %v", tzArea.Area().Name)

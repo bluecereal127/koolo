@@ -32,7 +32,7 @@ func (c Countess) Run() error {
 	if err != nil {
 		return err
 	}
-
+	action.OpenTPIfLeader()
 	areas := []area.ID{
 		area.ForgottenTower,
 		area.TowerCellarLevel1,
@@ -43,23 +43,14 @@ func (c Countess) Run() error {
 	}
 
 	for _, a := range areas {
-		// Get ingame adjacent areas so we can read the exit coordinates, check it matches the next level from script
-		adjacentLevels := c.ctx.Data.AdjacentLevels
-		nextExitArea := adjacentLevels[0]
-		for _, adj := range adjacentLevels {
-			if adj.Area == a {
-				nextExitArea = adj
-			}
-		}
-		// Get the exit coordinates (position) and clear towards it
-		nextExitPosition := nextExitArea.Position
-		action.ClearThroughPath(nextExitPosition, ClearRange, c.getMonsterFilter())
-		err = action.MoveToArea(a) // MoveToArea still needed to click exit
+		err = action.MoveToArea(a)
+		action.OpenTPIfLeader()
 		if err != nil {
 			return err
 		}
 	}
-
+	action.OpenTPIfLeader()
+	action.Buff()
 	// Try to move around Countess area
 	action.MoveTo(func() (data.Position, bool) {
 		if areaData, ok := context.Get().GameReader.GetData().Areas[area.TowerCellarLevel5]; ok {
